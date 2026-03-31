@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Roblox RP</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        input { margin: 5px; padding: 5px; }
+        table { border-collapse: collapse; margin-top: 10px; width: 100%; }
+        th, td { border: 1px solid black; padding: 5px; text-align: left; }
+        th { background-color: #eee; }
+    </style>
+</head>
+<body>
+    <h1>Panel Roblox RP</h1>
+
+    <label>Szukaj: <input id="search" placeholder="imiê, nazwisko lub PESEL"></label>
+    <button onclick="fetchUsers()">Odœwie¿</button>
+
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>Imiê</th>
+                <th>Nazwisko</th>
+                <th>PESEL</th>
+                <th>Status</th>
+                <th>Mandaty</th>
+                <th>Sprawy</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const API_URL = "/api/users"; // backend ju¿ istnieje
+
+        async function fetchUsers() {
+            const res = await fetch(API_URL);
+            const users = await res.json();
+            const searchVal = document.getElementById("search").value.toLowerCase();
+            const tbody = document.querySelector("#userTable tbody");
+            tbody.innerHTML = "";
+
+            users.forEach(u => {
+                if (searchVal && !(
+                    u.imie.toLowerCase().includes(searchVal) ||
+                    u.nazwisko.toLowerCase().includes(searchVal) ||
+                    u.pesel.toLowerCase().includes(searchVal)
+                )) return;
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${u.imie}</td>
+                    <td>${u.nazwisko}</td>
+                    <td>${u.pesel}</td>
+                    <td>${u.status}</td>
+                    <td>${u.mandaty.join(", ")}</td>
+                    <td>${u.sprawy.join(", ")}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        fetchUsers();
+    </script>
+</body>
+</html>
