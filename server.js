@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 let users = [];
 
-// Roblox wysy³a dane
+// Roblox wysyÂ³a dane
 app.post("/api/users", (req, res) => {
     const { imie, nazwisko, data, pesel, robloxNick } = req.body;
 
@@ -40,4 +40,4 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
 });
 
-app.listen(PORT, () => console.log("Serwer dzia³a"));
+app.listen(PORT, () => console.log("Serwer dziaÂ³a"));
