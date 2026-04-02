@@ -1,0 +1,43 @@
+const express = require("express");
+const path = require("path");
+const app = express();
+
+app.use(express.json());
+
+const PORT = process.env.PORT || 3000;
+
+let users = [];
+
+// Roblox wysy³a dane
+app.post("/api/users", (req, res) => {
+    const { imie, nazwisko, data, pesel, robloxNick } = req.body;
+
+    let user = users.find(u => u.pesel === pesel);
+
+    if (!user) {
+        users.push({
+            imie,
+            nazwisko,
+            data,
+            pesel,
+            robloxNick,
+            status: "czysty",
+            mandaty: [],
+            sprawy: []
+        });
+    }
+
+    res.sendStatus(200);
+});
+
+// lista graczy
+app.get("/api/users", (req, res) => {
+    res.json(users);
+});
+
+// strona
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.listen(PORT, () => console.log("Serwer dzia³a"));
