@@ -1,43 +1,61 @@
 const express = require("express");
 const path = require("path");
-const app = express();
+const fs = require("fs");
 
+const app = express();
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
-let users = [];
+const DATA_FILE = "data.json";
 
-// Roblox wysyÂ³a dane
+// ?? wczytaj dane z pliku
+function loadData() {
+    try {
+        const data = fs.readFileSync(DATA_FILE);
+        return JSON.parse(data);
+    } catch {
+        return [];
+    }
+}
+
+// ?? zapisz dane
+function saveData(data) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+}
+
+// ?? API – odbieranie z Roblox
 app.post("/api/users", (req, res) => {
+    let users = loadData();
+
     const { imie, nazwisko, data, pesel, robloxNick } = req.body;
 
-    let user = users.find(u => u.pesel === pesel);
+    users.push({
+        imie,
+        nazwisko,
+        data,
+        pesel,
+        robloxNick,
+        status: "czysty",
+        mandaty: [],
+        sprawy: []
+    });
 
-    if (!user) {
-        users.push({
-            imie,
-            nazwisko,
-            data,
-            pesel,
-            robloxNick,
-            status: "czysty",
-            mandaty: [],
-            sprawy: []
-        });
-    }
+    saveData(users);
 
+    console.log("Zapisano:", imie, nazwisko);
     res.sendStatus(200);
 });
 
-// lista graczy
+// ?? API – pobieranie
 app.get("/api/users", (req, res) => {
+    const users = loadData();
     res.json(users);
 });
 
-// strona
+// ?? strona
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
 });
 
-app.listen(PORT, () => console.log("Serwer dziaÂ³a"));
+app.listen(PORT, () => console.log("Serwer dzia³a"));

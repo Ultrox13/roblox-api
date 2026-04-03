@@ -1,70 +1,100 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Lista graczy Roblox</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<title>Panel RP</title>
+
 <style>
-  body { font-family: 'Roboto', sans-serif; background: #f4f7f9; color: #333; padding: 20px; }
-  h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
-  button { display: block; margin: 0 auto 20px auto; padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; transition: 0.2s; }
-  button:hover { background: #2ecc71; }
-  table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
-  th, td { padding: 12px 15px; text-align: left; }
-  th { background: #34495e; color: white; font-weight: 500; }
-  tr:nth-child(even) { background: #ecf0f1; }
-  tr:hover { background: #d1f2eb; transition: 0.2s; }
-  tbody tr td { border-bottom: 1px solid #ddd; }
-  .container { max-width: 1000px; margin: 0 auto; }
+body {
+    font-family: Arial;
+    background: #111;
+    color: white;
+    text-align: center;
+}
+
+h1 {
+    color: #00ffcc;
+}
+
+input {
+    padding: 8px;
+    margin: 10px;
+    width: 250px;
+}
+
+button {
+    padding: 10px;
+    background: #00ffcc;
+    border: none;
+    cursor: pointer;
+}
+
+table {
+    margin: auto;
+    border-collapse: collapse;
+    width: 80%;
+}
+
+th, td {
+    border: 1px solid #555;
+    padding: 10px;
+}
+
+th {
+    background: #222;
+}
 </style>
+
 </head>
 <body>
 
-<div class="container">
-  <h1>Lista graczy Roblox</h1>
-  <button id="odswiez">Odśwież tabelę</button>
+<h1>📋 Baza obywateli RP</h1>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Imię</th>
-        <th>Nazwisko</th>
-        <th>Data</th>
-        <th>PESEL</th>
-        <th>Roblox Nick</th>
-      </tr>
-    </thead>
-    <tbody id="tabela-graczy"></tbody>
-  </table>
-</div>
+<input id="search" placeholder="Szukaj...">
+<button onclick="load()">Odśwież</button>
+
+<table>
+<tr>
+<th>Imię</th>
+<th>Nazwisko</th>
+<th>PESEL</th>
+<th>Status</th>
+</tr>
+<tbody id="table"></tbody>
+</table>
 
 <script>
-const API_URL = "http://localhost:3000/api/users"; // Twój backend
+const API = "https://roblox-api-1.onrender.com/api/users";
 
-function odswiezTabele() {
-  fetch(API_URL)
-    .then(res => res.json())
-    .then(data => {
-      const tabela = document.getElementById("tabela-graczy");
-      tabela.innerHTML = "";
-      data.forEach(u => {
-        tabela.innerHTML += `<tr>
-          <td>${u.imie || ""}</td>
-          <td>${u.nazwisko || ""}</td>
-          <td>${u.data || ""}</td>
-          <td>${u.pesel || ""}</td>
-          <td>${u.robloxNick || ""}</td>
+async function load() {
+    const res = await fetch(API);
+    const users = await res.json();
+
+    const search = document.getElementById("search").value.toLowerCase();
+    const table = document.getElementById("table");
+
+    table.innerHTML = "";
+
+    users.forEach(u => {
+        if (search && !(
+            u.imie.toLowerCase().includes(search) ||
+            u.nazwisko.toLowerCase().includes(search) ||
+            u.pesel.toLowerCase().includes(search)
+        )) return;
+
+        const row = `
+        <tr>
+            <td>${u.imie}</td>
+            <td>${u.nazwisko}</td>
+            <td>${u.pesel}</td>
+            <td>${u.status}</td>
         </tr>`;
-      });
-    })
-    .catch(err => {
-      console.error("Błąd pobierania danych:", err);
-      document.getElementById("tabela-graczy").innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Błąd pobierania danych</td></tr>`;
+
+        table.innerHTML += row;
     });
 }
 
-document.getElementById("odswiez").addEventListener("click", odswiezTabele);
-odswiezTabele();
+load();
 </script>
 
 </body>
